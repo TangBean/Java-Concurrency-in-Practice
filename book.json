@@ -1,0 +1,43 @@
+{
+    "title": "Java并发编程总结",
+    "plugins": [
+        "anchor-navigation-ex",
+        "github",
+        "github-buttons"
+    ],
+    "pluginsConfig": {
+        "github": {
+            "url": "https://github.com/TangBean"
+        },
+        "github-buttons": {
+            "buttons": [{
+            "user": "TangBean",
+            "repo": "JavaMultiThread",
+            "type": "star",
+            "size": "small",
+            "count": true
+            }]
+        },
+        "anchor-navigation-ex": {
+            "float": { 
+                "showLevelIcon": true,
+                "level1Icon": "fa fa-hand-o-right",
+                "level2Icon": "fa fa-hand-o-right",
+                "level3Icon": "fa fa-hand-o-right"
+            }
+        }
+    },
+
+    "pdf": {
+        "pageNumbers": true,
+        "fontFamily": "SimSun",
+        "fontSize": 14,
+        "paperSize": "a4",
+        "margin": {
+            "right": 30,
+            "left": 30,
+            "top": 30,
+            "bottom": 50
+        }
+    }
+}
