@@ -1,5 +1,14 @@
 # AbstractQueuedSynchronizer 框架 (AQS)
 
+<!-- TOC -->
+
+- [AbstractQueuedSynchronizer 框架 (AQS)](#abstractqueuedsynchronizer-%E6%A1%86%E6%9E%B6-aqs)
+	- [AQS 框架的方法](#aqs-%E6%A1%86%E6%9E%B6%E7%9A%84%E6%96%B9%E6%B3%95)
+	- [AQS 使用方法](#aqs-%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+
+<!-- /TOC -->
+
+
 AQS 框架是用来构建锁或其他同步组件的基础框架，其核心思想为： **如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，AQS 通过 CLH 队列实现了这种机制。** 其实现原理为： **使用了一个 int 成员变量表示同步状态，然后通过内置的 FIFO 队列来完场资源获取线程的排队工作**  。使用 AQS 能简单高效地构造出大量的同步器，如：
 
 - ReentrantLock
