@@ -1,4 +1,4 @@
-# Java中的锁
+# Java 中的锁
 
 <!-- TOC -->
 
@@ -19,7 +19,7 @@
 
 <!-- /TOC -->
 
-## Lock接口
+## Lock 接口
 
 在 Java SE 5 后，Java 并发包 java.util.concurrent 中新增了 `Lock` 接口及其相关实现类，如：`ReentrantLock` 来实现锁的功能，它提供了与 `synchronized` 相似的同步功能，不过在使用时需要显示的获取锁和释放锁，虽然从这个角度来看，使用 Lock 接口更为麻烦，不过我们可以通过 Lock 接口的实现类，实现以下功能：
 
