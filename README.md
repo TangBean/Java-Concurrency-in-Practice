@@ -1,6 +1,6 @@
 # 《Java 并发编程实战》阅读笔记
 
-本 repo 为《Java 并发编程实战》的阅读笔记，
+有关 Java 并发编程~
 
 ## Content
 
