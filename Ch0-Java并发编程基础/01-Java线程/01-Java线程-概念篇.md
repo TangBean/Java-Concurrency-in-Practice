@@ -1,0 +1,113 @@
+# Java 线程：概念篇
+
+[toc]
+
+- 线程是比进程更轻量级的调度执行单位，CPU 调度的基本单位就是线程。
+- 线程的引入，将一个进程的资源分配和执行调度分开。
+- 各个线程既可以共享进程资源（内存地址、文件 I/O 等），又可独立调度。
+- **Java 的 Thread 类：** 所有关键方法都是 Native 的，说明这些方法无法使用平台无关的手段实现。
+
+
+## 线程的生命周期状态
+
+想要了解线程，我们可以先从它的程（人）生轨迹入手，也就是它的生命周期，线程是操作系统中的一个重要概念，而 Java 线程本质上只是对操作系统的线程进行了封装，简单打个比方就是，Java 线程相当于
+所以我们先来看看通用的线程生命周期是什么样的，再来看看 Java 都对其进行了怎样的封装。
+
+### 通用的线程生命周期
+
+首先，通用的线程生命周期模型将线程的状态分为了以下五种：
+- **初始状态：**
+    - 线程仅仅在编程语言层面被创建，在操作系统中并没有被创建，因此还不能被分配 CPU 资源；
+    - 相当于现在只是在 Java 中 new 了个 `Thread` 对象，还没调用 `start()` 方法。
+- **可运行状态：**
+    - 真正的操作系统线程此时已经成功被创建，线程已经可以被分配 CPU 资源了。
+- **运行状态：**
+    - 当有空闲的 CPU 资源时，操作系统会将其分配给一个处于可运行状态的线程，可运行状态的线程一旦被分配的 CPU，它的状态将变为运行状态。
+- **休眠状态：**
+    - 运行状态的线程如果调用了某个阻塞式 API（如以阻塞方式读文件），那么这个线程将变为休眠状态，并放弃自己的 CPU 使用权；
+    - 当它的阻塞状态结束了，它的状态会变为可运行状态，等待再次被分配 CPU 资源。
+- **终止状态：**
+    - 当线程执行完或出现异常时，它就会进入终止状态，这是一个终态（只进不出的饕餮状态），就是挂了。
+
+它们之间的状态流转关系为：
+
+![通用线程生命周期](media/%E9%80%9A%E7%94%A8%E7%BA%BF%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-1.jpeg)
+
+
+### Java 中线程的生命周期
+
+对于 Java 线程而言，它对操作系统的线程状态划分略有不满。
+
+首先，它觉得可运行状态和运行状态还搞两个状态有点麻烦，这两个状态只对操作系统调度层面有用，而 Java 秉承不重复造轮子的原则，将线程的调度交给操作系统处理了。所以，它把这两个状态合并成一个状态，即 RUNNABLE。
+
+接下来，它又嫌弃休眠状态的分类太过笼统，所以它又细化了休眠状态，根据休眠的原因，将其细分为了：BLOCKED、WAITING、TIME_WAITING 状态。
+
+最后，Java 将线程的生命周期状态改成了如下形式：
+
+![Java线程生命周期](media/Java%E7%BA%BF%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-1.jpeg)
+
+接下来，我们将这些状态之间的流转规则进行探究，主要有以下三条链路：
+- `RUNNABLE -> BLOCKED/WAITING/TIME_WAITING`
+- `NEW -> RUNNABLE`
+- `RUNNABLE -> TERMINATED`
+
+
+## 线程的生命周期状态转换
+
+### `可运行/运行状态 -> 休眠状态`
+
+- `RUNNABLE -> BLOCKED`：
+    - 线程等待 synchronized 的隐式锁时，触发该状态转换。
+- `RUNNABLE -> WAITING`：
+    - 有三种场景会触发这种转换：
+        - 已获取 synchronized 隐式锁的线程，调用无参数的 `Object.wait()` 方法。
+        - 调用无参数的 `Thread.join()` 方法。
+            - 因为 `Thread.join()` 其实是通过调用线程对象本身的 `wait(0)` 方法实现的。
+        - 调用 `LockSupport.park()` 方法。
+- `RUNNABLE -> TIMED_WAITING`：
+    - 有五种场景会触发这种转换：
+        - 调用带超时参数的 `Thread.sleep(long millis)` 方法；
+        - 获得 synchronized 隐式锁的线程，调用带超时参数的 `Object.wait(long timeout)` 方法；
+        - 调用带超时参数的 `Thread.join(long millis)` 方法；
+        - 调用带超时参数的 `LockSupport.parkNanos(Object blocker, long deadline)` 方法；
+        - 调用带超时参数的 `LockSupport.parkUntil(long deadline)` 方法。
+
+> ##### LockSupport 对象说明：
+> 
+> Java 并发包中的锁，都是基于该对象实现的，其使用方法如下：
+> - 调用 `LockSupport.park()` 方法，当前线程会阻塞，线程的状态会从 RUNNABLE 转换到 WAITING。
+> - 调用 `LockSupport.park()` 方法，当前线程会阻塞，线程的状态会从 RUNNABLE 转换到 WAITING。
+
+### `初始状态 -> 可运行/运行状态`
+
+Java 刚创建出来的 `Thread thread` 对象就是 NEW 状态，调用了 `thread.start()` 方法后，线程就进入了 RUNNABLE 状态。
+
+
+### `可运行/运行状态 -> 中止状态`
+
+- 线程执行完 `run()` 方法后，会自动转换到 TERMINATED 状态。
+- 线程在执行 `run()` 方法的时，有异常抛出，线程也会被终止。
+
+> ##### 如何强制中断 `run()` 方法的执行？
+> 
+> 当 `run()` 方法中调用了一个耗时很长的方法时，我们等的不耐烦了，此时我们需要强制中断 `run()` 方法的执行。
+> 
+> 在 Java 的 Thread 中，倒是给我们提供了一个 `stop()` 方法，不过该方法已经被标记为 `@Deprecated` 的了，官方已经不推荐我们使用它了。
+> 
+> 不推荐它的原因是它太危险了，`stop()` 方法不会给线程任何处理后事的机会，直接就杀掉线程，如果此时线程正好持有 ReentrantLock 锁，它被干掉后会导致这个锁永远不会被释放，这实在是太危险了。
+> 
+> 一种比较优雅的取消线程的方式是**中断**，即调用 `interrupt()` 方法，这个方法并没做什么实质上的事情，它相当于只是给线程打上了一个标记，而后我们可以通过一些手段（如调用 `Thread.interrupted()` 方法）来检测当前线程是否被打上了中断标记，来决定如何终止线程。
+> 
+> ```java
+> if (Thread.interrupted()) { // Clears interrupted status!
+>     // do something like lock.unlock()
+>     throw new InterruptedException();
+> }
+> ```
+> 
+> 详情可见：[安全取消线程](../../../Ch2-构造安全的并发应用程序/04-安全取消线程.md)。
+
+参考文章：
+- [极客时间 | Java线程（上）：Java线程的生命周期](https://time.geekbang.org/column/article/86366)
+- [极客时间 | Java线程（中）：创建多少线程才是合适的？](https://time.geekbang.org/column/article/86666)
+- [极客时间 | Java线程（下）：为什么局部变量是线程安全的？](https://time.geekbang.org/column/article/86695)
