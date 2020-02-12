@@ -31,7 +31,7 @@
 
 它们之间的状态流转关系为：
 
-![通用线程生命周期](media/%E9%80%9A%E7%94%A8%E7%BA%BF%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-1.jpeg)
+![通用线程生命周期](media/通用线程生命周期.jpeg)
 
 
 ### Java 中线程的生命周期
@@ -44,7 +44,7 @@
 
 最后，Java 将线程的生命周期状态改成了如下形式：
 
-![Java线程生命周期](media/Java%E7%BA%BF%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F-1.jpeg)
+![Java线程生命周期](media/Java线程生命周期.jpeg)
 
 接下来，我们将这些状态之间的流转规则进行探究，主要有以下三条链路：
 - `RUNNABLE -> BLOCKED/WAITING/TIME_WAITING`
@@ -72,7 +72,7 @@
         - 调用带超时参数的 `LockSupport.parkNanos(Object blocker, long deadline)` 方法；
         - 调用带超时参数的 `LockSupport.parkUntil(long deadline)` 方法。
 
-> ##### LockSupport 对象说明：
+> #### LockSupport 对象说明：
 > 
 > Java 并发包中的锁，都是基于该对象实现的，其使用方法如下：
 > - 调用 `LockSupport.park()` 方法，当前线程会阻塞，线程的状态会从 RUNNABLE 转换到 WAITING。
@@ -88,7 +88,7 @@ Java 刚创建出来的 `Thread thread` 对象就是 NEW 状态，调用了 `thr
 - 线程执行完 `run()` 方法后，会自动转换到 TERMINATED 状态。
 - 线程在执行 `run()` 方法的时，有异常抛出，线程也会被终止。
 
-> ##### 如何强制中断 `run()` 方法的执行？
+> #### 如何强制中断 `run()` 方法的执行？
 > 
 > 当 `run()` 方法中调用了一个耗时很长的方法时，我们等的不耐烦了，此时我们需要强制中断 `run()` 方法的执行。
 > 
