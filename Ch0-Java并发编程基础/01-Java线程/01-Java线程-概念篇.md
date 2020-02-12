@@ -114,7 +114,7 @@ Java 刚创建出来的 `Thread thread` 对象就是 NEW 状态，调用了 `thr
 
 </br>
 
-下一篇：[Java线程：使用篇](./01-Java线程/01-Java线程-使用篇.md)
+下一篇：[Java线程：使用篇](./01-Java线程-使用篇.md)
 
 ---
 
